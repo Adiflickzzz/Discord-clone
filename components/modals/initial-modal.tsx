@@ -24,8 +24,15 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
 
 export const InitialModal = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const formSchema = z.object({
     name: z.string().min(1, {
       message: "Server name is required !",
@@ -34,6 +41,7 @@ export const InitialModal = () => {
       message: "Server image is required",
     }),
   });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,6 +55,10 @@ export const InitialModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Dialog open>
