@@ -10,18 +10,17 @@ const SetupPage = async () => {
     where: {
       members: {
         some: {
-          //@ts-ignore
           profileId: profile.id,
         },
       },
     },
   });
 
-  if (server) {
-    return redirect("/servers/${server.id}");
+  if (!server) {
+    return <InitialModal />;
   }
-
-  return <InitialModal />;
+  
+  return redirect("/servers/${server.id}");
 };
 
 export default SetupPage;
