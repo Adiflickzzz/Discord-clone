@@ -73,3 +73,15 @@ body,
     @apply bg-background text-foreground;
   }
 }
+
+@media (min-width: 768px) {
+  .custom-show {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .custom-show {
+    display: none;
+  }
+}
