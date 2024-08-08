@@ -19,8 +19,8 @@ const SetupPage = async () => {
   if (!server) {
     return <InitialModal />;
   }
-  
-  return redirect("/servers/${server.id}");
+
+  return redirect(`/servers/${server.id}`);
 };
 
 export default SetupPage;
