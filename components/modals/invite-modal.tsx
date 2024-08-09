@@ -50,16 +50,16 @@ export const InviteModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden rounded-lg">
-        <DialogHeader className="pt-5 px-6 font-bold">
+        <DialogHeader className="pt-5 px-6 text-2xl font-bold">
           Invite Friends !
         </DialogHeader>
         <div className="px-5 py-2">
-          <Label className="uppercase text-sm font-bold text-zinc-500 dark:text-secondary/70">
+          <Label className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
             Server invite link
           </Label>
           <div className="flex items-center mt-2 gap-x-2">
             <Input
-              className="bg-zinc-300/50 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-black"
+              className="bg-zinc-300/50 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-black/[.9] font-bold"
               value={inviteUrl}
               disabled={isLoading}
             />
