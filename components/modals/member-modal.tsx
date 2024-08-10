@@ -36,6 +36,11 @@ import {
 import { useModal } from "@/hooks/use-modal-store";
 import { ServerWithMembersWithProfiles } from "@/types";
 import { UserAvatar } from "../user-avatar";
+import { MemberRole } from "@prisma/client";
+
+import qs from "query-string";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const roleIconMap = {
   GUEST: null,
@@ -44,12 +49,55 @@ const roleIconMap = {
 };
 
 export const MemberModal = () => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose, type, data } = useModal();
-  const [loadingId, setLoadingId] = useState();
+  const [loadingId, setLoadingId] = useState("");
 
   const isModalOpen = isOpen && type === "members";
 
   const { server } = data as { server: ServerWithMembersWithProfiles };
+
+  const onKick = async (memberId: string) => {
+    try {
+      setLoadingId(memberId);
+      const url = qs.stringifyUrl({
+        url: `/api/members/${memberId}`,
+        query: {
+          serverId: server?.id,
+        },
+      });
+
+      const response = await axios.delete(url);
+
+      router.refresh();
+      onOpen("members", { server: response.data });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingId("");
+    }
+  };
+
+  const onRoleChange = async (memberId: string, role: MemberRole) => {
+    try {
+      setLoadingId(loadingId);
+
+      const url = qs.stringifyUrl({
+        url: `/api/members/${memberId}`,
+        query: {
+          serverId: server?.id,
+        },
+      });
+
+      router.refresh();
+      const response = await axios.patch(url, { role });
+      onOpen("members", { server: response.data });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingId("");
+    }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -86,25 +134,35 @@ export const MemberModal = () => {
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => onRoleChange(member.id, "GUEST")}
+                              >
                                 <Shield className="mr-2 w-4 h-4" />
                                 Guest
                                 {member.role === "GUEST" && (
-                                  <Check className="h-4 w-4 ml-auto" />
+                                  <Check className="h-4 w-4 ml-10" />
                                 )}
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-emerald-500 font-semibold">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  onRoleChange(member.id, "MODERATOR")
+                                }
+                                className="text-emerald-500 font-semibold"
+                              >
                                 <ShieldCheck className="mr-2 w-4 h-4" />
                                 Moderator
                                 {member.role === "MODERATOR" && (
-                                  <Check className="h-4 w-4 ml-auto" />
+                                  <Check className="h-4 w-4 ml-2" />
                                 )}
                               </DropdownMenuItem>
                             </DropdownMenuSubContent>
                           </DropdownMenuPortal>
                         </DropdownMenuSub>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="dark:text-rose-500 text-rose-500 font-semibold">
+                        <DropdownMenuItem
+                          onClick={() => onKick(member.id)}
+                          className="dark:text-rose-500 text-rose-500 font-semibold"
+                        >
                           <UserMinus className="h-4 w-4 mr-2" />
                           Kick
                         </DropdownMenuItem>
